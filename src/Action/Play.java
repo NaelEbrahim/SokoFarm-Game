@@ -21,8 +21,6 @@ public class Play {
     }
 
     public State UserPlay(State state) {
-        // Save current State For Set As Parent To New State
-        State parent = new State(state);
         System.out.println("W : to Move Farmer Up \nS : to Move Farmer Down\nA : to Move Farmer Left\nD : to Move Farmer Right\nQ : to Exit the Game");
         Position farmerpos = state.getFarmerpos();
         MainLogic logic = new MainLogic(state);
@@ -36,12 +34,10 @@ public class Play {
                 if (logic.HandleMoveAction(dirpos, "UP")) {
                     System.out.println("================= New Board After Action =================");
                     Operation.printBoard(state.getBoard());
-                    state.setParent(parent);
 
                     // Check Final State
                     if (logic.checkFinalState()) {
                         new MainLogic(state);
-                        Operation.printBoard(state.getParent().getBoard());
                         return null;
                     } else {
                         return new State(state);
@@ -56,12 +52,10 @@ public class Play {
                 if (logic.HandleMoveAction(dirpos, "DOWN")) {
                     System.out.println("================= New Board After Action =================");
                     Operation.printBoard(state.getBoard());
-                    state.setParent(parent);
 
                     // Check Final State
                     if (logic.checkFinalState()) {
                         new MainLogic(state);
-                        Operation.printBoard(state.getParent().getBoard());
                         return null;
                     } else {
                         return new State(state);
@@ -76,12 +70,10 @@ public class Play {
                 if (logic.HandleMoveAction(dirpos, "RIGHT")) {
                     System.out.println("================= New Board After Action =================");
                     Operation.printBoard(state.getBoard());
-                    state.setParent(parent);
 
                     // Check Final State
                     if (logic.checkFinalState()) {
                         new MainLogic(state);
-                        Operation.printBoard(state.getParent().getBoard());
                         return null;
                     } else {
                         return new State(state);
@@ -96,12 +88,10 @@ public class Play {
                 if (logic.HandleMoveAction(dirpos, "LEFT")) {
                     System.out.println("================= New Board After Action =================");
                     Operation.printBoard(state.getBoard());
-                    state.setParent(parent);
 
                     // Check Final State
                     if (logic.checkFinalState()) {
                         new MainLogic(state);
-                        Operation.printBoard(state.getParent().getBoard());
                         return null;
                     } else {
                         return new State(state);
@@ -143,14 +133,14 @@ public class Play {
             State parent = new State(currentState);
 
             // Check if the current State is the final state
-            if (currentState.getSeedList().isEmpty()) {
+            if (new MainLogic(currentState).checkGoal()) {
                 System.out.println("End BFS");
                 Operation.printBoard(currentState.getBoard());
                 System.out.println("===============  PATH ==============");
                 for (State fina : currentState.getPath()) {
                     Operation.printBoard(fina.getBoard());
-                    System.out.println("\n");
                 }
+                System.out.println("Cost= " + currentState.getCost());
                 return;
             }
 
@@ -160,7 +150,7 @@ public class Play {
             // Try All Possible States
             for (State curr : result) {
                 if (!visited.contains(curr)) {
-                    curr.setParent(parent);
+                    curr.setParentAndPath(parent);
                     queue.add(curr);
                 }
             }
@@ -181,15 +171,15 @@ public class Play {
             State parent = new State(currentState);
 
             // Check if the current State is the final state
-            if (currentState.getSeedList().isEmpty()) {
+            if (new MainLogic(currentState).checkGoal()) {
                 System.out.println(stack.size());
                 System.out.println("End DFS");
                 Operation.printBoard(currentState.getBoard());
                 System.out.println("===============  PATH ==============");
                 for (State fina : currentState.getPath()) {
                     Operation.printBoard(fina.getBoard());
-                    System.out.println("\n");
                 }
+                System.out.println("Cost= " + currentState.getCost());
                 return;
             }
 
@@ -199,11 +189,60 @@ public class Play {
             // Try All Possible States
             for (State curr : result) {
                 if (!visited.contains(curr)) {
-                    curr.setParent(parent);
+                    curr.setParentAndPath(parent);
                     stack.add(curr);
                 }
             }
         }
         System.out.println("there is no solution");
     }
+
+    public void UCS(State state) {
+        PriorityQueue<State> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(State::getCost));
+        Map<State, State> parentMap = new HashMap<>();
+        Set<State> visited = new HashSet<>();
+
+        priorityQueue.add(state);
+        visited.add(state);
+
+        while (!priorityQueue.isEmpty()) {
+            State currentState = priorityQueue.poll();
+            State parent = new State(currentState);
+            visited.add(currentState);
+
+            // Check if the current state is the final state
+            if (new MainLogic(currentState).checkGoal()) {
+                System.out.println("End UCS");
+                Operation.printBoard(currentState.getBoard());
+                System.out.println("===============  PATH ==============");
+                Operation.printPath(currentState, parentMap);
+                System.out.println("Cost= " + currentState.getCost());
+                return;
+            }
+
+            // Generate all possible states
+            List<State> result = AvailableMoves(new State(currentState));
+
+            // Try all possible states
+            for (State nextState : result) {
+                if (!visited.contains(nextState) || nextState.getCost() < GetElementCostFromHashSet(visited, nextState)) {
+                    // Set the Current State As Parent For Next State
+                    parentMap.put(nextState, currentState);
+                    nextState.setParentAndPath(parent);
+                    priorityQueue.add(nextState);
+                }
+            }
+        }
+        System.out.println("There is no solution");
+    }
+
+    private int GetElementCostFromHashSet(Set<State> Hashset, State state) {
+        for (State current : Hashset) {
+            if (current.equals(state)) {
+                return state.getCost();
+            }
+        }
+        return -1;
+    }
+
 }

@@ -16,6 +16,8 @@ public class State {
 
     State parent = null;
 
+    int cost = 0;
+
     List<State> path = new ArrayList<>();
 
     @Override
@@ -25,12 +27,20 @@ public class State {
 
     public List<Position> SeedList = new ArrayList<>();
 
-    public void setParent(State parent) {
-        if (parent != null ){
+    public void setParentAndPath(State parent) {
+        if (parent != null) {
             this.parent = parent;
             this.path.addAll(parent.getPath());
             this.path.add(this);
         }
+    }
+
+    public int getCost() {
+        return cost;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost + 1;
     }
 
     public State getParent() {
@@ -81,7 +91,8 @@ public class State {
         this.columns = state.getColumns();
         this.board = new char[this.rows][this.columns];
         if (state.getParent() != null) {
-            this.setParent(state.getParent());
+            this.setParentAndPath(state.getParent());
+            setCost(state.parent.getCost());
         }
         for (int i = 0; i < this.rows; i++) {
             System.arraycopy(state.board[i], 0, this.board[i], 0, this.columns);
@@ -115,6 +126,7 @@ public class State {
         this.columns = columns;
         this.board = board;
         this.parent = null;
+        this.cost = 0;
         this.path.add(this);
     }
 

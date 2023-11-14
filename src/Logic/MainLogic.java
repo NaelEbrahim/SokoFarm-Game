@@ -4,6 +4,8 @@ import Structure.Methods.Operation;
 import Structure.Component.Position;
 import Structure.Component.State;
 
+import java.util.List;
+
 public class MainLogic {
 
     State state;

@@ -3,6 +3,8 @@ package Structure.Methods;
 import Structure.Component.Position;
 import Structure.Component.State;
 
+import java.util.Map;
+
 public class Operation {
 
     State state;
@@ -58,6 +60,18 @@ public class Operation {
             }
             System.out.println('\n');
         }
+        System.out.println('\n');
+    }
+
+    public static void printPath(State state, Map<State, State> parentMap) {
+        if (state == null) {
+            return;
+        }
+        // Print Path
+        printPath(parentMap.get(state), parentMap);
+        // Print Goal
+        Operation.printBoard(state.getBoard());
+        System.out.println("\n");
     }
 
 }
