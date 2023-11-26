@@ -20,11 +20,11 @@ public class Main extends KeyAdapter {
             state = new State().CreateInitialState(level);
         }
 
-        System.out.println("Select Number The Way To Solve:\n1- User Play\n2- BFS\n3- DFS\n4- UCS");
+        System.out.println("Select Number The Way To Solve:\n1- User Play\n2- BFS\n3- DFS\n4- UCS\n5- AStar\n6- Hill Climbing\n7- OriginalHillClimbing");
         int way = scanner.nextInt();
 
-        while (way > 4 || way < 1) {
-            System.out.println("Invalid Way Number , Select 1 -> 4");
+        while (way > 7 || way < 1) {
+            System.out.println("Invalid Way Number , Select 1 -> 6");
             way = scanner.nextInt();
         }
 
@@ -37,6 +37,9 @@ public class Main extends KeyAdapter {
             case 2 -> play.BFS(state);
             case 3 -> play.DFS(state);
             case 4 -> play.UCS(state);
+            case 5 -> play.AStar(state);
+            case 6 -> play.HillClimbing(state);
+            case 7 -> play.OriginalHillClimbing(state);
         }
 
     }

@@ -130,17 +130,21 @@ public class Play {
         while (!queue.isEmpty()) {
             State currentState = new State(queue.poll());
             visited.add(currentState);
-            State parent = new State(currentState);
+            // ReInitialize Path to currentState Because its null
+            if (currentState.getPath().isEmpty()) {
+                currentState.AddToPath(currentState);
+            }
 
             // Check if the current State is the final state
             if (new MainLogic(currentState).checkGoal()) {
-                System.out.println("End BFS");
+                System.out.println("End BFS , The Goal State Is :\n");
                 Operation.printBoard(currentState.getBoard());
-                System.out.println("===============  PATH ==============");
+                System.out.println("============== PATH ==============");
                 for (State fina : currentState.getPath()) {
                     Operation.printBoard(fina.getBoard());
                 }
                 System.out.println("Cost= " + currentState.getCost());
+                System.out.println("Total Visited= " + visited.size());
                 return;
             }
 
@@ -150,12 +154,12 @@ public class Play {
             // Try All Possible States
             for (State curr : result) {
                 if (!visited.contains(curr)) {
-                    curr.setParentAndPath(parent);
+                    curr.setParentAndPath(currentState);
                     queue.add(curr);
                 }
             }
         }
-        System.out.println("there is no solution");
+        System.out.println("There Is No Solution");
     }
 
     public void DFS(State state) {
@@ -168,18 +172,21 @@ public class Play {
         while (!stack.isEmpty()) {
             State currentState = new State(stack.pop());
             visited.add(currentState);
-            State parent = new State(currentState);
+            // ReInitialize Path to currentState Because its null
+            if (currentState.getPath().isEmpty()) {
+                currentState.AddToPath(currentState);
+            }
 
             // Check if the current State is the final state
             if (new MainLogic(currentState).checkGoal()) {
-                System.out.println(stack.size());
-                System.out.println("End DFS");
+                System.out.println("End DFS , The Goal State Is :\n");
                 Operation.printBoard(currentState.getBoard());
-                System.out.println("===============  PATH ==============");
+                System.out.println("============== PATH ==============");
                 for (State fina : currentState.getPath()) {
                     Operation.printBoard(fina.getBoard());
                 }
                 System.out.println("Cost= " + currentState.getCost());
+                System.out.println("Total Visited= " + visited.size());
                 return;
             }
 
@@ -189,12 +196,12 @@ public class Play {
             // Try All Possible States
             for (State curr : result) {
                 if (!visited.contains(curr)) {
-                    curr.setParentAndPath(parent);
+                    curr.setParentAndPath(currentState);
                     stack.add(curr);
                 }
             }
         }
-        System.out.println("there is no solution");
+        System.out.println("There Is No Solution");
     }
 
     public void UCS(State state) {
@@ -206,17 +213,21 @@ public class Play {
         visited.add(state);
 
         while (!priorityQueue.isEmpty()) {
-            State currentState = priorityQueue.poll();
-            State parent = new State(currentState);
+            State currentState = new State(priorityQueue.poll());
             visited.add(currentState);
+            // ReInitialize Path to currentState Because its null
+            if (currentState.getPath().isEmpty()) {
+                currentState.AddToPath(currentState);
+            }
 
             // Check if the current state is the final state
             if (new MainLogic(currentState).checkGoal()) {
-                System.out.println("End UCS");
+                System.out.println("End UCS , The Goal State Is :\n");
                 Operation.printBoard(currentState.getBoard());
-                System.out.println("===============  PATH ==============");
+                System.out.println("============== PATH ==============");
                 Operation.printPath(currentState, parentMap);
                 System.out.println("Cost= " + currentState.getCost());
+                System.out.println("Total Visited= " + visited.size());
                 return;
             }
 
@@ -225,24 +236,216 @@ public class Play {
 
             // Try all possible states
             for (State nextState : result) {
-                if (!visited.contains(nextState) || nextState.getCost() < GetElementCostFromHashSet(visited, nextState)) {
+                if (!visited.contains(nextState)) {
                     // Set the Current State As Parent For Next State
                     parentMap.put(nextState, currentState);
-                    nextState.setParentAndPath(parent);
+                    nextState.setParentAndPath(currentState);
                     priorityQueue.add(nextState);
                 }
             }
         }
-        System.out.println("There is no solution");
+        System.out.println("There Is No Solution");
     }
 
-    private int GetElementCostFromHashSet(Set<State> Hashset, State state) {
-        for (State current : Hashset) {
-            if (current.equals(state)) {
-                return state.getCost();
+    public void AStar(State state) {
+        PriorityQueue<State> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(State::getPriority));
+        Map<State, State> parentMap = new HashMap<>();
+        Set<State> visited = new HashSet<>();
+
+        priorityQueue.add(state);
+        visited.add(state);
+
+        while (!priorityQueue.isEmpty()) {
+            State currentState = new State(priorityQueue.poll());
+            visited.add(currentState);
+            // Reinitialize Path to currentState Because it's null
+            if (currentState.getPath().isEmpty()) {
+                currentState.AddToPath(currentState);
+            }
+
+            // Check if the current state is the final state
+            if (new MainLogic(currentState).checkGoal()) {
+                System.out.println("End A*, The Goal State Is :\n");
+                Operation.printBoard(currentState.getBoard());
+                System.out.println("============== PATH ==============");
+                Operation.printPath(currentState, parentMap);
+                System.out.println("Cost= " + currentState.getCost());
+                System.out.println("Total Visited= " + visited.size());
+                return;
+            }
+
+            // Generate all possible states
+            List<State> result = AvailableMoves(new State(currentState));
+
+            // Try all possible states
+            for (State nextState : result) {
+                // Calculate the priority of the next state
+                int priority = nextState.getCost() + Heuristic_1(nextState);
+
+                if (!visited.contains(nextState) || priority < nextState.getPriority()) {
+                    // Update the priority and parent of the next state
+                    nextState.setPriority(priority);
+                    parentMap.put(nextState, currentState);
+                    nextState.setParentAndPath(currentState);
+                    priorityQueue.add(nextState);
+                }
             }
         }
-        return -1;
+        System.out.println("There Is No Solution");
+    }
+
+    public void HillClimbing(State state) {
+        PriorityQueue<State> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(State::getPriority));
+        Map<State, State> parentMap = new HashMap<>();
+        Set<State> visited = new HashSet<>();
+
+        priorityQueue.add(state);
+        visited.add(state);
+
+        while (!priorityQueue.isEmpty()) {
+            State currentState = new State(priorityQueue.poll());
+            visited.add(currentState);
+            // ReInitialize Path to currentState Because its null
+            if (currentState.getPath().isEmpty()) {
+                currentState.AddToPath(currentState);
+            }
+
+            // Check if the current state is the final state
+            if (new MainLogic(currentState).checkGoal()) {
+                System.out.println("End Hill Climbing , The Goal State Is :\n");
+                Operation.printBoard(currentState.getBoard());
+                System.out.println("============== PATH ==============");
+                Operation.printPath(currentState, parentMap);
+                System.out.println("Cost= " + currentState.getCost());
+                System.out.println("Total Visited= " + visited.size());
+                return;
+            }
+
+            // Generate all possible states
+            List<State> result = AvailableMoves(new State(currentState));
+
+            // Try all possible states
+            for (State nextState : result) {
+                if (!visited.contains(nextState)) {
+                    // Set the Current State As Parent For Next State
+                    parentMap.put(nextState, currentState);
+                    // Set Heuristic Value For Next State
+                    nextState.setPriority(Heuristic_1(nextState));
+                    nextState.setParentAndPath(currentState);
+                    priorityQueue.add(nextState);
+                }
+            }
+        }
+        System.out.println("There Is No Solution");
+    }
+
+    public void OriginalHillClimbing(State state) {
+
+        State currentState = new State(state);
+        int currentCost = Heuristic_1(currentState);
+
+        while (true) {
+
+            if (new MainLogic(currentState).checkGoal()) {
+                Operation.printBoard(currentState.getBoard());
+                return;
+            }
+
+            // Generate All Possible Neighbors
+            List<State> neighbors = AvailableMoves(new State(currentState));
+
+            State bestNeighbor = null;
+            int bestNeighborCost = Integer.MAX_VALUE;
+
+            // Find the neighbor with the lowest heuristic cost
+            for (State neighbor : neighbors) {
+                int neighborCost = Heuristic_1(neighbor);
+                if (neighborCost < bestNeighborCost) {
+                    // Update Best Neighbor With Cost
+                    bestNeighbor = new State(neighbor);
+                    bestNeighborCost = neighborCost;
+                }
+            }
+
+            // If no better neighbor is found, return the current state
+            if (bestNeighborCost >= currentCost) {
+                Operation.printBoard(currentState.getBoard());
+                return;
+            }
+
+            // Update the current state and cost to the best neighbor
+            currentState = new State(bestNeighbor);
+            currentCost = bestNeighborCost;
+        }
+    }
+
+    private int Heuristic_1(State state) {
+        int totalDistance = 0;
+
+        // Iterate over each seed and calculate the distance to the closest hole
+        for (Position seed : state.getSeedList()) {
+            // Set Big Random Value To minDistance
+            int minDistance = Integer.MAX_VALUE;
+
+            for (Position hole : state.getHoleList()) {
+                // Calculate the Manhattan distance between Seed And Hole
+                int distance = Math.abs(seed.getX() - hole.getX()) + Math.abs(seed.getY() - hole.getY());
+                minDistance = Math.min(minDistance, distance);
+            }
+            totalDistance += minDistance;
+        }
+        return totalDistance;
+    }
+
+    public int Heuristic_2(State state) {
+        int totalDistance = 0;
+
+        // Iterate over each seed and calculate the distance to the closest hole
+        for (Position seed : state.getSeedList()) {
+            // Set a large random value to minDistance
+            int minDistance = Integer.MAX_VALUE;
+
+            for (Position hole : state.getHoleList()) {
+                // Calculate the Manhattan distance between the seed and Farmer And Save It In Current
+                Position current = new Position(Math.abs(seed.getX() - state.getFarmerpos().getX()), Math.abs(seed.getX() - state.getFarmerpos().getX()));
+                // Calculate the Manhattan distance between Current And Hole
+                int distance = Math.abs(current.getX() - hole.getX()) + Math.abs(current.getY() - hole.getY());
+
+                minDistance = Math.min(minDistance, distance);
+            }
+
+            // Calculate the distance between the farmer and the seed
+            int farmerDistance = Math.abs(state.getFarmerpos().getX() - seed.getX())
+                    + Math.abs(state.getFarmerpos().getY() - seed.getY());
+
+            // Adjust the total distance by considering the farmer's position
+            totalDistance += minDistance + farmerDistance ;
+        }
+        return totalDistance;
+    }
+
+    public int Heuristic_3(State state) {
+        int totalDistance = 0;
+
+        // Iterate over each seed and calculate the distance to the corresponding hole
+        for (int i = 0; i < state.getSeedList().size(); i++) {
+            Position seed = state.getSeedList().get(i);
+            Position hole = state.getHoleList().get(i);
+
+            // Calculate the Manhattan distance between the seed and hole
+            int distance = Math.abs(seed.getX() - hole.getX()) + Math.abs(seed.getX() - hole.getX());
+
+            totalDistance += distance;
+        }
+
+        // Calculate the distance between the farmer and the seeds
+        for (Position seed : state.getSeedList()) {
+            int distance = Math.abs(seed.getX() - state.getFarmerpos().getX())
+                    + Math.abs(seed.getY() - state.getFarmerpos().getY());
+
+            totalDistance += distance;
+        }
+        return totalDistance;
     }
 
 }

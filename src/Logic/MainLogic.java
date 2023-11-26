@@ -4,8 +4,6 @@ import Structure.Methods.Operation;
 import Structure.Component.Position;
 import Structure.Component.State;
 
-import java.util.List;
-
 public class MainLogic {
 
     State state;
@@ -135,11 +133,11 @@ public class MainLogic {
                 this.boardOp.AddEmpty(position);
                 this.MoveFarmer(this.state.getFarmerpos(), direction);
             }
+            this.state.DeleteFromSeedList(position);
             // Seed Leave Hole
             if (oldElement == 'K') {
                 this.boardOp.AddFarmerWithHole(position);
             }
-            this.state.DeleteFromSeedList(position);
         } else {
             System.out.println("Can not move Up , There is Rock in this place , Or Board Limit");
         }

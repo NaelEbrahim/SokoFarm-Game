@@ -18,6 +18,12 @@ public class State {
 
     int cost = 0;
 
+    int priority ;
+
+    public List<Position> SeedList = new ArrayList<>();
+
+    List <Position> HoleList = new ArrayList<>();
+
     List<State> path = new ArrayList<>();
 
     @Override
@@ -25,7 +31,17 @@ public class State {
         return Arrays.deepHashCode(this.getBoard());
     }
 
-    public List<Position> SeedList = new ArrayList<>();
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public List<Position> getHoleList() {
+        return HoleList;
+    }
 
     public void setParentAndPath(State parent) {
         if (parent != null) {
@@ -45,6 +61,10 @@ public class State {
 
     public State getParent() {
         return parent;
+    }
+
+    public void AddToPath(State state) {
+        this.path.add(state);
     }
 
     public List<State> getPath() {
@@ -90,6 +110,7 @@ public class State {
         this.rows = state.getRows();
         this.columns = state.getColumns();
         this.board = new char[this.rows][this.columns];
+        this.priority = state.getPriority();
         if (state.getParent() != null) {
             this.setParentAndPath(state.getParent());
             setCost(state.parent.getCost());
@@ -99,6 +120,7 @@ public class State {
         }
         this.farmerpos = state.getFarmerpos();
         this.SeedList = new ArrayList<>(state.getSeedList());
+        this.HoleList = new ArrayList<>(state.getHoleList());
     }
 
     @Override
@@ -156,6 +178,9 @@ public class State {
 
                 state.SeedList.add(new Position(3, 2));
                 state.SeedList.add(new Position(5, 2));
+
+                state.HoleList.add(new Position(1,1));
+                state.HoleList.add(new Position(4,3));
             }
             case 2 -> {
                 // Level 2
@@ -174,6 +199,9 @@ public class State {
 
                 state.SeedList.add(new Position(2, 2));
                 state.SeedList.add(new Position(2, 3));
+
+                state.HoleList.add(new Position(3,3));
+                state.HoleList.add(new Position(4,3));
             }
             case 3 -> {
                 //Level 3
@@ -194,6 +222,9 @@ public class State {
 
                 state.SeedList.add(new Position(1, 2));
                 state.SeedList.add(new Position(5, 2));
+
+                state.HoleList.add(new Position(1,1));
+                state.HoleList.add(new Position(3,1));
             }
             case 4 -> {
                 //  Level 4
@@ -214,6 +245,9 @@ public class State {
 
                 state.SeedList.add(new Position(2, 3));
                 state.SeedList.add(new Position(3, 3));
+
+                state.HoleList.add(new Position(3,2));
+                state.HoleList.add(new Position(5,3));
             }
             case 5 -> {
                 // Level 5
@@ -233,6 +267,9 @@ public class State {
 
                 state.SeedList.add(new Position(2, 4));
                 state.SeedList.add(new Position(4, 4));
+
+                state.HoleList.add(new Position(3,3));
+                state.HoleList.add(new Position(5,1));
             }
             case 6 -> {
                 // Level 6
@@ -250,6 +287,9 @@ public class State {
 
                 state.SeedList.add(new Position(2, 2));
                 state.SeedList.add(new Position(3, 2));
+
+                state.HoleList.add(new Position(1,3));
+                state.HoleList.add(new Position(3,4));
             }
             case 7 -> {
                 // Level 7
@@ -268,6 +308,9 @@ public class State {
 
                 state.SeedList.add(new Position(2, 4));
                 state.SeedList.add(new Position(3, 2));
+
+                state.HoleList.add(new Position(1,5));
+                state.HoleList.add(new Position(2,3));
             }
             default -> {
                 return null;

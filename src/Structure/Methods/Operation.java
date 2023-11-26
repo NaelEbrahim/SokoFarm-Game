@@ -5,6 +5,7 @@ import Structure.Component.State;
 
 import java.util.Map;
 
+
 public class Operation {
 
     State state;
