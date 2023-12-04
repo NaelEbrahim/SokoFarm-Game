@@ -236,7 +236,7 @@ public class Play {
 
             // Try all possible states
             for (State nextState : result) {
-                if (!visited.contains(nextState)) {
+                if (!visited.contains(nextState) || nextState.getCost() < FindElementInHashSet(visited,nextState).getCost() ) {
                     // Set the Current State As Parent For Next State
                     parentMap.put(nextState, currentState);
                     nextState.setParentAndPath(currentState);
@@ -245,6 +245,16 @@ public class Play {
             }
         }
         System.out.println("There Is No Solution");
+    }
+
+    private State FindElementInHashSet (Set <State> set , State state) {
+        State findedElement = null ;
+        for (State element : set){
+            if (element.equals(state)){
+                findedElement =  element ;
+            }
+        }
+        return findedElement ;
     }
 
     public void AStar(State state) {
@@ -268,7 +278,7 @@ public class Play {
                 System.out.println("End A*, The Goal State Is :\n");
                 Operation.printBoard(currentState.getBoard());
                 System.out.println("============== PATH ==============");
-                Operation.printPath(currentState, parentMap);
+                //Operation.printPath(currentState, parentMap);
                 System.out.println("Cost= " + currentState.getCost());
                 System.out.println("Total Visited= " + visited.size());
                 return;
@@ -380,6 +390,8 @@ public class Play {
     }
 
     private int Heuristic_1(State state) {
+        MainLogic logic = new MainLogic(state);
+        int penalty = 0 ;
         int totalDistance = 0;
 
         // Iterate over each seed and calculate the distance to the closest hole
@@ -394,10 +406,16 @@ public class Play {
             }
             totalDistance += minDistance;
         }
-        return totalDistance;
+        // Check if the current state is a losing state
+        if (logic.checkLose()) {
+            penalty = 10000;
+        }
+        return totalDistance + penalty;
     }
 
     public int Heuristic_2(State state) {
+        MainLogic logic = new MainLogic(state);
+        int penalty = 0 ;
         int totalDistance = 0;
 
         // Iterate over each seed and calculate the distance to the closest hole
@@ -419,12 +437,18 @@ public class Play {
                     + Math.abs(state.getFarmerpos().getY() - seed.getY());
 
             // Adjust the total distance by considering the farmer's position
-            totalDistance += minDistance + farmerDistance ;
+            totalDistance += minDistance  + farmerDistance ;
         }
-        return totalDistance;
+        // Check if the current state is a losing state
+        if (logic.checkLose()) {
+            penalty = 10000;
+        }
+        return totalDistance + penalty;
     }
 
     public int Heuristic_3(State state) {
+        MainLogic logic = new MainLogic(state);
+        int penalty = 0 ;
         int totalDistance = 0;
 
         // Iterate over each seed and calculate the distance to the corresponding hole
@@ -445,7 +469,11 @@ public class Play {
 
             totalDistance += distance;
         }
-        return totalDistance;
+        // Check if the current state is a losing state
+        if (logic.checkLose()) {
+            penalty = 10000;
+        }
+        return totalDistance + penalty;
     }
 
 }

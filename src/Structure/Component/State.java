@@ -312,6 +312,30 @@ public class State {
                 state.HoleList.add(new Position(1,5));
                 state.HoleList.add(new Position(2,3));
             }
+            case 8 -> {
+                // Level 8
+                board = new char[][]{
+                        {'E', 'R', 'R', 'R', 'E', 'E', 'E','E'},
+                        {'E', 'R', 'E', 'R', 'E', 'E', 'E','E'},
+                        {'R', 'R', 'E', 'R', 'R', 'R', 'E','E'},
+                        {'R', 'H', 'E', 'E', 'E', 'R', 'R','R'},
+                        {'R', 'E', 'R', 'E', 'E', 'F', 'E','R'},
+                        {'R', 'E', 'S', 'E', 'S', 'R', 'E','R'},
+                        {'R', 'E', 'R', 'R', 'H', 'E', 'E','R'},
+                        {'R', 'R', 'R', 'R', 'R', 'E', 'E','R'},
+                        {'E', 'E', 'E', 'E', 'R', 'R', 'R','R'},
+                };
+                // Level 8
+                state = new State(9, 8, board);
+
+                state.setFarmerpos(new Position(4, 5));
+
+                state.SeedList.add(new Position(5, 2));
+                state.SeedList.add(new Position(5, 4));
+
+                state.HoleList.add(new Position(3,1));
+                state.HoleList.add(new Position(6,4));
+            }
             default -> {
                 return null;
             }

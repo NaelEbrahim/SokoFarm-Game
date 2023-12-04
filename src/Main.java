@@ -8,14 +8,14 @@ public class Main extends KeyAdapter {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Select Level From 1 -> 7 To Start Game");
+        System.out.println("Select Level From 1 -> 8 To Start Game");
         int level = scanner.nextInt();
 
         State state = new State().CreateInitialState(level);
         Play play = new Play();
 
-        while (level > 7 || level < 1) {
-            System.out.println("Invalid Level Number , Select 1 -> 7");
+        while (level > 8 || level < 1) {
+            System.out.println("Invalid Level Number , Select 1 -> 8");
             level = scanner.nextInt();
             state = new State().CreateInitialState(level);
         }
@@ -24,7 +24,7 @@ public class Main extends KeyAdapter {
         int way = scanner.nextInt();
 
         while (way > 7 || way < 1) {
-            System.out.println("Invalid Way Number , Select 1 -> 6");
+            System.out.println("Invalid Way Number , Select 1 -> 7");
             way = scanner.nextInt();
         }
 
